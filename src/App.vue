@@ -1,31 +1,17 @@
 <template>
-  <h1
-    :[attr]="'active'"
-    @[event]="add">
-    {{ msg }}
-  </h1>
+  <Fruits />
 </template>
 
 <script>
+import Fruits from '~/components/Fruits'
+
 export default {
-  data() {
-    return {
-      msg: 'active',
-      attr: 'class',
-      event: 'click',
-    }
-  },
-  methods: {
-    add() {
-      this.msg += '!'
-    }
+  components: {
+    Fruits
   }
 }
 </script>
 
 <style>
-  h1 {
-    font-size: 50px;
-    color: orange;
-  }
+
 </style>

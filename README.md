@@ -122,3 +122,193 @@
   }
 </script>
 ```
+
+# Computed
+
+- 계산된 데이터
+
+데이터 영역에 저장해둔 데이터를 연산을 통해서 정의한 다음 정의된 값을 반환해서 사용할 수 있는 새로운 데이터
+
+```html
+<script>
+  export default {
+    data() {
+      return {
+        fruits: ["Apple", "Banana", "Cherry"],
+      };
+    },
+
+    // 미리 계산된 데이터 영역
+    computed: {
+      hasFruit() {
+        return this.fruits.length > 0;
+      },
+
+      reverseFruits() {
+        return this.fruits.map((fruit) => {
+          fruit.split("").reverse().join("");
+        });
+      },
+    },
+  };
+</script>
+```
+
+- methods 의 메서드를 computed 에 정의하고 여러 번 호출하면 한 번만 연산을 한다.
+
+```html
+<template>
+  <h1>{{ reversedMessage() }}</h1>
+  <h1>{{ reversedMessage() }}</h1>
+  <h1>{{ reversedMessage() }}</h1>
+  <h1>{{ reversedMessage() }}</h1>
+</template>
+
+<script>
+  export default {
+    data() {
+      return {
+        msg: "Hello!",
+      };
+    },
+    methods: {
+      reversedMessage() {
+        return this.msg.split("").reverse().join("");
+      },
+    },
+  };
+</script>
+```
+
+- 위 코드는 reversedMessage 메서드의 return 연산을 총 4번 연산을 하여 결과를 출력한다.
+
+```html
+<template>
+  <h1>{{ reversedMessage }}</h1>
+  <h1>{{ reversedMessage }}</h1>
+  <h1>{{ reversedMessage }}</h1>
+  <h1>{{ reversedMessage }}</h1>
+</template>
+
+<script>
+  export default {
+    data() {
+      return {
+        msg: "Hello!",
+      };
+    },
+    computed: {
+      reversedMessage() {
+        return this.msg.split("").reverse().join("");
+      },
+    },
+  };
+</script>
+```
+
+- 위 코드는 reversedMessage 함수의 return 연산을 한 번 수행한 후 그 결과를 저장해두고 4번 출력한다. 즉, 연산은 한 번만 한다.
+
+<br/>
+
+## Getter, Setter
+
+기본적으로 computed 의 내용들은 읽기 전용이다. 아래와 같이 버튼을 누르면 reversedMessage 의 내용을 수정하려 해도 정상적으로 동작하지 않는 것을 볼 수 있다.
+
+```html
+<template>
+  <button @click="add">ADD</button>
+  <h1>{{ msg }}</h1>
+</template>
+
+<script>
+  export default {
+    data() {
+      return {
+        msg: "Hello",
+      };
+    },
+    computed: {
+      reversedMessage() {
+        return this.msg.split("").reverse().join("");
+      },
+    },
+    methods: {
+      add() {
+        this.reversedMessage += "!?";
+      },
+    },
+  };
+</script>
+```
+
+이를 해결하기 위해 아래와 같이 수정한다.
+
+```html
+<template>
+  <button @click="add">ADD</button>
+  <h1>{{ msg }}</h1>
+</template>
+
+<script>
+  export default {
+    data() {
+      return {
+        msg: "Hello",
+      };
+    },
+    computed: {
+      reversedMessage: {
+        get() {
+          return this.msg.split("").reverse().join("");
+        },
+        set(value) {
+          this.msg = value;
+        },
+      },
+    },
+    methods: {
+      add() {
+        this.reversedMessage += "!?";
+      },
+    },
+  };
+</script>
+```
+
+- add 메서드가 동작하면 this.reversedMessage 부분에 `!?` 를 더해 재할당하면 set() 이 실행된다.
+- this.msg 의 값이 바뀌면서 get() 또한 실행된다.
+- 바뀐 결과값이 새로 출력된다.
+
+## Watch
+
+data 의 특정 값이 바뀔 경우에 메서드가 실행될 수 있도록 설정하는 옵션
+
+```html
+<template>
+  <section class="box">
+    <h1 class="title">Watch</h1>
+    <h1 @click="changeMessage">{{ msg }}</h1>
+    <h1>{{ reversedMessage }}</h1>
+  </section>
+</template>
+
+<script>
+  export default {
+    data() {
+      return {
+        msg: "Hello?",
+      };
+    },
+    methods: {
+      changeMessage() {
+        this.msg = "Good!";
+      },
+    },
+    watch: {
+      msg() {
+        console.log(this.msg);
+      },
+    },
+  };
+</script>
+```
