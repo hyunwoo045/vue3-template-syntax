@@ -35,7 +35,6 @@
     <h1>{{ reversedMessage }}</h1>
     <h1>{{ reversedMessage }}</h1>
   </section>
-
   <section class="box">
     <h1 class="title">
       Watch
@@ -45,6 +44,17 @@
     </h1>
     <h1>{{ reversedMessage }}</h1>
   </section>
+
+  <section class="box">
+    <h1 class="title">
+      Class and Style Binding
+    </h1>
+    <h1
+      :class="{ active: isActive }"
+      @click="activate">
+      Hello?!({{ isActive }})
+    </h1>
+  </section>
 </template>
 
 <script>
@@ -53,7 +63,8 @@ export default {
   data() {
     return {
       fruits: ['Apple', 'Banana', 'Cherry'],
-      msg: 'Hello?'
+      msg: 'Hello?',
+      isActive: false
     }
   },
 
@@ -81,6 +92,9 @@ export default {
     },
     changeMessage() {
       this.msg = 'Good!'
+    },
+    activate() {
+      this.isActive = !this.isActive
     }
   },
 
@@ -92,7 +106,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 body {
   font-size: 20px;
 }
@@ -102,5 +116,8 @@ body {
 .box .title {
   font-size: 35px;
 }
-
+.active {
+  color:red;
+  font-weight: bold;
+}
 </style>

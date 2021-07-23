@@ -312,3 +312,102 @@ data 의 특정 값이 바뀔 경우에 메서드가 실행될 수 있도록 설
   };
 </script>
 ```
+
+- 웹에서 Hello? 부분을 클릭하면 Good! 으로 변경됨과 동시에 console 창에 Good! 이 출력된다.
+- 변수와 같은 이름으로 설정해야 동작한다.
+- computed 의 내용도 감시 가능하다.
+
+</br>
+
+## Class & Style Binding
+
+https://v3.ko.vuejs.org/guide/class-and-style.html
+
+클래스를 동적으로 전환할 수 있다.
+
+```html
+<div :class="{ active: isActive }"></div>
+```
+
+<br/>
+
+인라인 스타일도 바인딩이 가능하다.
+CSS 속성의 이름에는 camelCase 또는 kebab-case (따옴표와 함께) 사용할 수 있다.
+
+```html
+<div :style="{ color: activeColor, fontSize: fontSize + 'px' }"></div>
+```
+
+```javascript
+data() {
+  return {
+    activeColor: 'red',
+    fontSize: 30
+  }
+}
+```
+
+- 더 깔끔하게 만들기 위해서는 스타일 객체에 직접 바인딩 하는 것이 더 좋다.
+
+```html
+<div :style="styleObject"></div>
+```
+
+```javascript
+data() {
+  return {
+    styleObject: {
+      color: 'red',
+      fontSize: '13px'
+    }
+  }
+}
+```
+
+- 동적으로 스타일을 변경하는 것도 가능하다.
+
+```html
+<div :style="fontStyle" @click="changeStyle"></div>
+```
+
+```javascript
+data() {
+  return {
+    fontStyle: {
+      color: 'orange',
+      fontSize: '30px',
+    }
+  }
+}
+methods: {
+  changeStyle() {
+    this.fontStyle.color = 'red'
+  }
+}
+```
+
+- 여러 스타일을 적용하기 위해 배열 구문을 활용할 수 있다.
+
+```html
+<div :style="[fontStyle, backgroundStyle]" @click="changeStyle"></div>
+```
+
+```javascript
+data() {
+  return {
+    fontStyle: {
+      color: 'orange',
+      fontSize: '30px',
+    },
+    backgroundStyle: {
+      backgroundColor: royalblue
+    }
+
+  }
+}
+methods: {
+  changeStyle() {
+    this.fontStyle.color = 'red'
+  }
+}
+```
