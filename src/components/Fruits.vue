@@ -54,7 +54,6 @@
       Hello?!({{ isActive }})
     </h1>
   </section>
-
   <section class="box">
     <h1 class="title">
       Conditional Rendering
@@ -72,9 +71,25 @@
       Bye !!!
     </h1>
   </section>
+  <section class="box">
+    <h1 class="title">
+      List Rendering
+    </h1>
+    <button @click="listRederingHandler">
+      Click Me!
+    </button>
+    <ul>
+      <li
+        v-for="fruit in newFruits"
+        :key="fruit.id">
+        {{ fruit.name }} - {{ fruit.id }}
+      </li>
+    </ul>
+  </section>
 </template>
 
 <script>
+import shortid from 'shortid'
 export default { 
   
   data() {
@@ -83,7 +98,7 @@ export default {
       msg: 'Hello?',
       isActive: false,
       isShow: true,
-      count: 0
+      count: 0,
     }
   },
 
@@ -91,7 +106,7 @@ export default {
     hasFruit() {
       return this.fruits.length > 0
     },
-    reverseFruits() {   // 여러 번 호출되더라도 여러 번 연산하지 않는다.
+    reverseFruits() {
       return this.fruits.map((fruit) => {
         return fruit.split("").reverse().join("");
       });
@@ -103,6 +118,14 @@ export default {
       set(v) {
         this.msg = v;
       },
+    },
+    newFruits() { 
+      return this.fruits.map((fruit)=> {
+        return {
+          id: shortid.generate(),
+          name: fruit,
+        }
+      })
     }
   },
   methods: {
@@ -118,6 +141,9 @@ export default {
     handler() {
       this.isShow = !this.isShow
       this.count += 1
+    },
+    listRederingHandler() {
+      this.fruits.push('Orange')
     }
   },
 

@@ -478,9 +478,110 @@ https://v3.ko.vuejs.org/guide/conditional.html
 
 - template 태그에는 v-show 를 적용할 수 없고, v-else 또한 지원하지 않는다.
 
+<br/>
+
 ### v-if vs v-show
 
 - v-if 는 실제 조건부 렌더링이다. 전환 도중에 조건부 블록 내부의 이벤트 리스너 및 자식 컴포넌트들이 올바르게 제거되고 다시 생성된다.
 - v-if 는 게으르다. 조건이 거짓이면 아무것도 하지 않는다. 참이 될 떄 까지 렌더링 되지 않는다.
 - v-show 는 초기 조건과 관계 없이 항상 렌더링 된다. CSS 전환을 기반으로 한다. (display: none)
 - 결과적으로, v-if 는 전환 비용이 높고, v-show 는 초기 렌더링 비용이 높다. 즉, 무언가를 자주 전환해야 한다면 v-show 를, 그렇지 않다면 v-if 를 사용하는 것이 더 낫다.
+
+<br/>
+
+## 리스트 렌더링
+
+일반적인 리스트 렌더링
+
+````html
+<ul>
+  <li v-for="(fruit, index) in fruits" :key="fruit">
+    {{ fruit }} - {{ index + 1 }}
+  </li>
+  ```
+</ul>
+````
+
+<br/>
+computed 의 내용도 리스트 렌더링이 가능하다.
+
+```html
+<template>
+  <ul>
+    <li v-for="fruit in newFruits" :key="fruit.id">{{ fruit.name }}</li>
+  </ul>
+</template>
+```
+
+```javascript
+data() {
+  return {
+    fruits: ['Apple', 'Banana', 'Cherry']
+  }
+}
+computed: {
+  newFruits() {
+    return this.fruits.map((fruits, idx) => {
+      return {
+        id: idx,
+        name: fruit
+      }
+    })
+  }
+}
+```
+
+### shortid 패키지를 이용하여 id 를 생성
+
+```bash
+$ npm i -D shortid
+```
+
+```html
+<script>
+  import shortid from "shortid";
+
+  export default {
+    computed: {
+      newFruits() {
+        return this.fruit.map((fruit) => ({
+          id: shortid.generate(), // 고유 id 생성
+          name: fruit,
+        }));
+      },
+    },
+  };
+</script>
+```
+
+- 객체 구조 분해
+
+```html
+<ul>
+  <li v-for="{id, name} in newFruits" :key="id">{{ name }}-{{ id} }</li>
+</ul>
+```
+
+<br/>
+
+### 배열 변경 감지
+
+[Detail](https://v3.ko.vuejs.org/guide/conditional.html)
+
+배열의 변이 메소드로 인해 데이터가 변경되면 Vue 가 감시하고 있다가 뷰 갱신한다. 래핑된 메서드는 아래와 같다
+
+- push()
+- pop()
+- shift()
+- unshift()
+- splice()
+- sort()
+- reverse()
+
+원본 배열을 변경하는 메소드들이며 `filter()`, `concat()`, `slice()` 와 같이 원본을 변경하지 않는 메소드들은 할당 연산을 통해서 배열을 교체하여, 변경된 내용이 화면에 출력될 수 있도록 할 수 있다.
+
+```javascript
+this.fruit = this.fruit.filter((fruit) => fruit.match(/Apple/));
+```
+
+이 때 Vue 는 기존 DOM 을 버리고 전체를 다시 렌더링 하는 것이 아님.
