@@ -44,7 +44,6 @@
     </h1>
     <h1>{{ reversedMessage }}</h1>
   </section>
-
   <section class="box">
     <h1 class="title">
       Class and Style Binding
@@ -53,6 +52,24 @@
       :class="{ active: isActive }"
       @click="activate">
       Hello?!({{ isActive }})
+    </h1>
+  </section>
+
+  <section class="box">
+    <h1 class="title">
+      Conditional Rendering
+    </h1>
+    <button @click="handler">
+      Click Me!
+    </button>
+    <h1 v-if="isShow">
+      Hello !!!
+    </h1>
+    <h1 v-else-if="count > 3">
+      Count > 3
+    </h1>
+    <h1 v-else>
+      Bye !!!
     </h1>
   </section>
 </template>
@@ -64,7 +81,9 @@ export default {
     return {
       fruits: ['Apple', 'Banana', 'Cherry'],
       msg: 'Hello?',
-      isActive: false
+      isActive: false,
+      isShow: true,
+      count: 0
     }
   },
 
@@ -95,6 +114,10 @@ export default {
     },
     activate() {
       this.isActive = !this.isActive
+    },
+    handler() {
+      this.isShow = !this.isShow
+      this.count += 1
     }
   },
 

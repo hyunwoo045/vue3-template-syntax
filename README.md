@@ -411,3 +411,76 @@ methods: {
   }
 }
 ```
+
+<br/>
+
+## 조건부 렌더링
+
+https://v3.ko.vuejs.org/guide/conditional.html
+
+조건에 따라 블록을 렌더링 할 때 사용된다.
+
+```html
+<div v-if="awesome">Hello !</div>
+```
+
+- v-else 와 함께 else 블록도 함께 사용 가능하다.
+- v-else-if 도 사용 가능!
+
+```html
+<div v-if="awesome">I'm Awesome!!</div>
+<div v-else-if="holy">Holy !!!</div>
+<div v-else>Moly !!!</div>
+```
+
+- 여러 요소들을 한번에 제어하기 위해서 아래와 같은 방법을 사용할 수 있다.
+
+```html
+<template>
+  <div v-if="awesome">
+    <h1>Awesome!</h1>
+    <p>Javascript</p>
+    <p>Vue.js</p>
+  </div>
+</template>
+```
+
+하지만 이와 같은 방법은 불필요한 div 요소가 렌더링 되어 최적화 측면에서 비효율적일 수 있으므로 아래와 같은 방법을 사용하는 것이 더 좋다.
+
+```html
+<template>
+  <template v-if="awesome">
+    <h1>Awesome!</h1>
+    <p>Javascript</p>
+    <p>Vue.js</p>
+  </template>
+</template>
+```
+
+- 실제로 element 에서 검사했을 때 template 요소는 렌더링 되지 않는 것을 확인할 수 있다.
+  - 주의) 최상위 template 태그 부분에는 v-if 를 사용해서는 안 된다.
+  - 전체 template 내용에 v-if 를 적용하고 싶으면 전체 template 을 한번 더 template 으로 감싸도록 하자.
+
+<br/>
+
+- v-if 는 조건에 맞지 않으면 렌더링 자체를 하지 않아 요소를 확인 할 수 없다.
+- 조건에 맞지 않아도 렌더링이 되도록 하여 요소를 확인하고 싶다면 v-show 디렉티브를 사용하도록 한다.
+
+```html
+<template>
+  <template v-show="awesome">
+    <h1>Awesome!</h1>
+    <p>Javascript</p>
+    <p>Vue.js</p>
+  </template>
+</template>
+```
+
+- template 태그에는 v-show 를 적용할 수 없고, v-else 또한 지원하지 않는다.
+
+### v-if vs v-show
+
+- v-if 는 실제 조건부 렌더링이다. 전환 도중에 조건부 블록 내부의 이벤트 리스너 및 자식 컴포넌트들이 올바르게 제거되고 다시 생성된다.
+- v-if 는 게으르다. 조건이 거짓이면 아무것도 하지 않는다. 참이 될 떄 까지 렌더링 되지 않는다.
+- v-show 는 초기 조건과 관계 없이 항상 렌더링 된다. CSS 전환을 기반으로 한다. (display: none)
+- 결과적으로, v-if 는 전환 비용이 높고, v-show 는 초기 렌더링 비용이 높다. 즉, 무언가를 자주 전환해야 한다면 v-show 를, 그렇지 않다면 v-if 를 사용하는 것이 더 낫다.
