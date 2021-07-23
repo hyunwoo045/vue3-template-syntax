@@ -86,6 +86,27 @@
       </li>
     </ul>
   </section>
+  <section class="box">
+    <h1 class="title">
+      Event Handling
+    </h1>
+    <button @click="addCounter">
+      Click Me!
+    </button>
+    <p> 카운터 입니다! {{ count }} 번 클릭 되었습니다. </p>
+  </section>
+
+  <section class="box">
+    <h1 class="title">
+      이벤트 수식어
+    </h1>
+    <div
+      class="parent"
+      @click="handlerA">
+      <div
+        class="child"></div>
+    </div>
+  </section>
 </template>
 
 <script>
@@ -144,6 +165,15 @@ export default {
     },
     listRederingHandler() {
       this.fruits.push('Orange')
+    },
+    addCounter() {
+      this.count += 1
+    },
+    handlerA() {
+      console.log('A')
+    },
+    handlerB() {
+      console.log('B')
     }
   },
 
@@ -155,7 +185,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 body {
   font-size: 20px;
 }
@@ -168,5 +198,17 @@ body {
 .active {
   color:red;
   font-weight: bold;
+}
+.parent {
+  width: 200px;
+  height: 100px;
+  background-color: royalblue;
+  margin: 10px;
+  padding: 10px;
+  .child {
+    width: 100px;
+    height: 100px;
+    background-color: orange;
+  }
 }
 </style>

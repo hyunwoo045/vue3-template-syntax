@@ -585,3 +585,539 @@ this.fruit = this.fruit.filter((fruit) => fruit.match(/Apple/));
 ```
 
 이 때 Vue 는 기존 DOM 을 버리고 전체를 다시 렌더링 하는 것이 아님.
+
+<br/><br/>
+
+## 이벤트 핸들링
+
+```html
+<button @click="addCounter">Click Me!</button>
+<p>카운터 입니다! {{ count }} 번 클릭 되었습니다.</p>
+```
+
+```javascript
+data() {
+  return {
+    count: 0
+  }
+}
+method: {
+  addCounter() {
+    this.count += 1
+  }
+}
+```
+
+- v-on 디렉티브를 이용하여 메소드를 호출할 때에 인자를 넘기는 것도 가능하다
+- 이 때 v-on 디렉티브내에서 인자를 넘길 때 `$event` 를 명시하여 event 객체를 넘길 수 있다.
+
+```html
+<button @click="handler('hi', $event)">Click!</button>
+```
+
+```javascript
+methods: {
+  handler(msg, event) {
+    console.log(msg)
+  }
+}
+```
+
+<br/>
+
+- 여러 개의 메소드를 호출 할 수 있다.
+- 이 때 넘길 인자가 없더라도 `()` 소괄호를 열고 닫아줘야 한다.
+
+```html
+<button @click="handlerA(), handlerB()">Click!</button>
+```
+
+```javascript
+methods: {
+  handlerA() {
+    console.log('A');
+  },
+  handlerB() {
+    console.log('B');
+  }
+}
+```
+
+<br/><br/>
+
+## 이벤트 수식어
+
+### - prevent
+
+event 의 기본 동작을 막는 방법으로 `preventDefault()` 를 사용할 수 있다. <br/>
+Vue 에서는 아래와 같이 v-on 디렉티브에 `.`(마침표) 뒤에 prevent 를 명시함으로써 이벤트의 기본 동작을 막을 수 있다.
+
+```html
+<a href="https://naver.com" target="_blank" @click.prevent="handler"></a>
+```
+
+- once : 특정 이벤트가 발생했을 때 메소드를 단 한 번만 실행되도록 해주는 수식어
+
+```html
+<a href="https://naver.com" target="_blank" @click.once="handler"></a>
+```
+
+- 체이닝으로 여러개의 수식어를 사용할 수 있다.
+
+```html
+<a href="https://naver.com" target="_blank" @click.prevent.once="handler"></a>
+```
+
+<br/>
+
+### - stop
+
+- 아래 코드는 이벤트 버블링 (Event Bubbling) 에 의해 child 를 클릭하면 parent 도 클릭하는 것으로 인식되어 B 가 출력되고 A 도 출력되게 된다.
+
+```html
+<div class="parent" @click="handlerA">
+  <div class="child" @click="handlerB"></div>
+</div>
+```
+
+```javascript
+export default {
+  methods: {
+    handlerA() {
+      console.log("A");
+    },
+    handlerB() {
+      console.log("B");
+    },
+  },
+};
+```
+
+```html
+<style scoped lang="scss">
+  .parent {
+    width: 200px;
+    height: 100px;
+    background-color: royalblue;
+    margin: 10px;
+    padding: 10px;
+    .child {
+      width: 100px;
+      height: 100px;
+      background-color: orange;
+    }
+  }
+</style>
+```
+
+- 이를 `stopPropagation()` 메소드를 이용하여 이벤트 전파를 막을 수 있다
+- Vue 는 `stop` 이벤트 수식어로 이벤트 전파를 막을 수 있다.
+
+```html
+<div class="parent" @click="handlerA">
+  <div class="child" @click.stop="handlerB"></div>
+</div>
+```
+
+- child 요소에 click 이벤트 뒤에 stop 수식어를 추가한다.
+
+```javascript
+export default {
+  methods: {
+    handlerA() {
+      console.log("A");
+    },
+    handlerB(event) {
+      // event.stopPropagation()
+      console.log("B");
+    },
+  },
+};
+```
+
+```html
+<style scoped lang="scss">
+  .parent {
+    width: 200px;
+    height: 100px;
+    background-color: royalblue;
+    margin: 10px;
+    padding: 10px;
+    .child {
+      width: 100px;
+      height: 100px;
+      background-color: orange;
+    }
+  }
+</style>
+```
+
+<br/>
+
+### - capture
+
+- 이벤트 버블링은 자식 요소를 클릭 했을 때 자식 요소의 이벤트가 먼저 발생하고 부모 요소의 이벤트가 발생한다.
+- 이벤트 캡쳐링 (Event Capturing) 은 이를 반대로 동작하도록 하는 기능이다.
+
+```html
+<div class="parent" @click.capture="handlerA">
+  <div class="child" @click="handlerB"></div>
+</div>
+```
+
+- 캡쳐링을 적용한 상태에서 자식 요소로의 이벤트 전파를 막을 수도 있다.
+
+```html
+<div class="parent" @click.capture.stop="handlerA">
+  <div class="child" @click="handlerB"></div>
+</div>
+```
+
+<br/>
+
+### - self
+
+- 기본적으로 부모 요소 위에 있는 자식 요소를 클릭하더라도 부모 요소의 이벤트가 잘 동작한다.
+- 자식 요소가 아닌 정확한 부모 요소의 영역을 클릭해야만 이벤트가 발생할 수 있도록 하기 위해서는 `self` 수식어를 사용한다.
+
+```html
+<div class="parent" @click.self="handlerA">
+  <div class="child"></div>
+</div>
+```
+
+### - passive
+
+이벤트의 로직과 화면의 움직임을 독립시켜 준다.
+
+아래 코드는 스크롤을 할 때 마다 event 를 10,000번씩 출력하는 코드이다.
+
+```html
+<template>
+  <div class="parent" @wheel="handler">
+    <div class="child"></div>
+  </div>
+</template>
+
+<script>
+  export default {
+    methods: {
+      handler(event) {
+        for (let i = 0; i < 10000; i++) {
+          console.log(event);
+        }
+      },
+    },
+  };
+</script>
+
+<style scoped lang="scss">
+  .parent {
+    width: 200px;
+    height: 100px;
+    background-color: royalblue;
+    margin: 10px;
+    padding: 10px;
+    overflow: auto;
+
+    .child {
+      width: 100px;
+      height: 2000px;
+      background-color: orange;
+    }
+  }
+</style>
+```
+
+- 이 때, 실제 웹에서 스크롤을 해보면 스크롤이 버벅이는 현상을 체감할 수 있다. 화면의 움직임과 로직을 웹이 동시에 처리하고 있기 때문이다.
+- 이 둘을 분리 시켜 주기 위해 이벤트 수식어로 `passive` 를 명시하여 화면의 움직임이 빠르게 동작할 수 있도록 할 수 있다.
+
+```html
+<template>
+  <div class="parent" @wheel.passive="handler">
+    <div class="child"></div>
+  </div>
+</template>
+
+<script>
+  export default {
+    methods: {
+      handler(event) {
+        for (let i = 0; i < 10000; i++) {
+          console.log(event);
+        }
+      },
+    },
+  };
+</script>
+
+<style scoped lang="scss">
+  .parent {
+    width: 200px;
+    height: 100px;
+    background-color: royalblue;
+    margin: 10px;
+    padding: 10px;
+    overflow: auto;
+
+    .child {
+      width: 100px;
+      height: 2000px;
+      background-color: orange;
+    }
+  }
+</style>
+```
+
+## 이벤트 - 키 수식어
+
+키보드 입력에 대하여 아래와 같이 핸들링 할 수 있다.
+
+```html
+<template>
+  <input type="text" @keydown="handler" />
+</template>
+
+<script>
+  export default {
+    methods: {
+      handler(event) {
+        if (event.key === "Enter") {
+          console.log("Enter!!!");
+        }
+      },
+    },
+  };
+</script>
+```
+
+이 내용을 Vue 는 키 수식어로 간편하게 핸들링 할 수 있다.
+
+```html
+<template>
+  <input type="text" @keydown.enter="handler" />
+</template>
+
+<script>
+  export default {
+    methods: {
+      handler(event) {
+        console.log("Enter!!!");
+      },
+    },
+  };
+</script>
+```
+
+체이닝도 가능하다. `Ctrl + A` 를 입력하면 `Enter!!!` 가 출력되는 내용이다.
+
+```html
+<template>
+  <input type="text" @keydown.ctrl.a="handler" />
+</template>
+
+<script>
+  export default {
+    methods: {
+      handler(event) {
+        console.log("Enter!!!");
+      },
+    },
+  };
+</script>
+```
+
+<br/>
+
+## 폼 입력 바인딩
+
+아래와 같은 데이터 출력 형식을 <u>단방향 데이터 바인딩 연결</u>이라고 말하며, `input` 태그 내에 내용을 수정하더라도 `h1` 태그의 내용을 수정되지 않는 것을 볼 수 있다.
+
+```html
+<template>
+  <h1>{{ msg }}</h1>
+  <input type="text" :value="msg" />
+</template>
+
+<script>
+  export default {
+    data() {
+      return {
+        msg: "Hello World!",
+      };
+    },
+  };
+</script>
+```
+
+반응성을 통해서 양방향 데이터 바인딩을 구현하기 위해 아래와 같이 수정한다.
+
+```html
+<template>
+  <h1>{{ msg }}</h1>
+  <input type="text" :value="msg" @input="handler" />
+</template>
+
+<script>
+  export default {
+    data() {
+      return {
+        msg: "Hello World!",
+      };
+    },
+    methods: {
+      handler(event) {
+        console.log(event.target.value);
+        this.msg = event.target.value;
+      },
+    },
+  };
+</script>
+```
+
+아래와 같이 인라인 방식으로 구현도 가능하다.
+
+```html
+<!-- 인라인 방식 -->
+<template>
+  <h1>{{ msg }}</h1>
+  <input type="text" :value="msg" @input="msg = $event.target.value" />
+</template>
+
+<script>
+  export default {
+    data() {
+      return {
+        msg: "Hello World!",
+      };
+    },
+  };
+</script>
+```
+
+아래와 같이 더 축소도 가능하다. v-model 이라는 디렉티브를 사용하는 것이다.
+
+```html
+<!-- v-model 사용 -->
+<template>
+  <h1>{{ msg }}</h1>
+  <input type="text" :value="msg" v-model="msg" />
+</template>
+
+<script>
+  export default {
+    data() {
+      return {
+        msg: "Hello World!",
+      };
+    },
+  };
+</script>
+```
+
+- v-model 을 사용할 때에 주의할 점은 한글을 입력할 때 글자 하나가 모두 완성되고 넘어가야 한 글자에 대한 변경점이 적용된다.
+- input 태그에서 한글을 입력 받을 때는 v-model 을 사용하지 않도록 한다.
+
+<br/>
+
+## v-model
+
+- `input` 태그 내에 내용이 변경되면 즉시 msg 의 값이 변경되는 코드
+
+```html
+<!-- 인라인 방식 -->
+<template>
+  <h1>{{ msg }}</h1>
+  <input type="text" :value="msg" @input="msg = $event.target.value" />
+</template>
+
+<script>
+  export default {
+    data() {
+      return {
+        msg: "Hello World!",
+      };
+    },
+  };
+</script>
+```
+
+위 코드에 input 이벤트를 change 로 변경하면 tab 키나 enter 키를 입력해야 변경점이 적용되도록 할 수 있다.
+
+```html
+<!-- change event -->
+<template>
+  <h1>{{ msg }}</h1>
+  <input type="text" :value="msg" @change="msg = $event.target.value" />
+</template>
+
+<script>
+  export default {
+    data() {
+      return {
+        msg: "Hello World!",
+      };
+    },
+  };
+</script>
+```
+
+위 코드를 v-model 로 적용하려면 `lazy` 라는 수식어를 사용한다.
+
+```html
+<!-- v-model lazy -->
+<template>
+  <h1>{{ msg }}</h1>
+  <input type="text" v-model.lazy="msg" />
+</template>
+
+<script>
+  export default {
+    data() {
+      return {
+        msg: "Hello World!",
+      };
+    },
+  };
+</script>
+```
+
+입력 란에 숫자만을 입력받아야 한다면 `number` 수식어를 이용한다
+
+```html
+<!-- v-model number -->
+<template>
+  <h1>{{ msg }}</h1>
+  <input type="text" v-model.number="msg" />
+</template>
+
+<script>
+  export default {
+    data() {
+      return {
+        msg: 123,
+      };
+    },
+  };
+</script>
+```
+
+앞 뒤 공백을 없애기 위해서는 `trim` 수식어를 이용한다. <br/>
+입력란을 수정되고 blur 될 때 trim 이 적용된다.
+
+```html
+<template>
+  <h1>{{ msg }}</h1>
+  <input type="text" v-model.trim="msg" />
+</template>
+
+<script>
+  export default {
+    data() {
+      return {
+        msg: "hello world!",
+      };
+    },
+  };
+</script>
+```
